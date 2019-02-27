@@ -60,6 +60,20 @@ class Log_simple_code_return
     }
 }
 
+
+class Log_simple_code_function_return_final
+{
+
+    public $return;
+    public $method;
+
+    public function __construct(Log_simple_code_return $return, Log_simple_code_function $method)
+    {
+        $this->return = $return;
+        $this->method = $method;
+    }
+}
+
 class Log_simple_code_function
 {
 
@@ -67,7 +81,6 @@ class Log_simple_code_function
     public $class_name;
     public $argument_list = array();
     public $return_list = array();
-    public $stack_type_list = array();
 
     public function __construct(string $name, string $class_name)
     {
@@ -75,10 +88,10 @@ class Log_simple_code_function
         $this->class_name = $class_name;
     }
 
-    public static function stack_get()
+    public static function stack_get(string $var_name)
     {
 
-        return apc_fetch();
+        return apc_fetch($var_name);
     }
 
     public function argument_add(Log_simple_code_argument $log_code_argument)
@@ -102,7 +115,7 @@ class Log_simple_code_function
 
         if ($this->return_list[$return_name]->stack_verif($var)) return false;
 
-        return apc_add($var);
+        return apc_add($return_name, $var);
     }
 
     public function call()
@@ -110,21 +123,21 @@ class Log_simple_code_function
 
         $class = $this->class_name;
         $method_static = $this->name;
+        $function_return_final = $class::$method_static($this->argument_list);
 
-        $obj = $class::$method_static($this->argument_list);
-        $res = $this->stack_verif($obj->stack);
+        if ($function_return_final->method->stack_verif() === false) return false;
 
-        if ($res === false) return false;
-
-        return $obj->return;
+        return $function_return_final->return;
     }
 
-    public function stack_verif(array $stack = array())
+    public function stack_verif()
     {
 
-        foreach ($stack as $key => $value_type) {
+        foreach ($this->return_list as $return_name => $var) {
 
-            if ($value_type !== $this->stack_type_list[$key]) return false;
+            $var_to_test = self::stack_get($return_name);
+
+            if ($var->stack_verif($var_to_test) === false) return false;
         }
         return true;
     }
