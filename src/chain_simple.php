@@ -1,28 +1,76 @@
 <?php
 
-trait chain_simple {
+/**
+ * Trait Chain_simple
+ */
+trait Chain_simple {
 
-    use compress_simple;
-    use block_simple;
+    use Compress_simple;
+    use Block_simple;
 
+    /**
+     * @var string
+     */
     private static $chain_block_sep = '--------- BLOCK_JSON --------- ';
+    /**
+     * @var string
+     */
     private static $chain_env = 'testnet';
+    /**
+     * @var
+     */
     private static $chain_file;
+    /**
+     * @var string
+     */
     private static $chain_block_file_ext = '.ch';
+    /**
+     * @var string
+     */
     private static $chain_file_add_mode = 'a+';
+    /**
+     * @var string
+     */
     private static $chain_dir = 'data/chain/';
 
+    /**
+     * @var string
+     */
     private static $chain_sign_prefix = 'PHP';
+    /**
+     * @var int
+     */
     private static $chain_complexity = 4;
+    /**
+     * @var int
+     */
     private static $chain_complexity_fill = 0;
 
+    /**
+     * @var int
+     */
     public static $chain_block_index = 1;
+    /**
+     * @var
+     */
     public static $chain_block_previous;
+    /**
+     * @var string
+     */
     public static $chain_block_hash_algo = 'sha256';
 
+    /**
+     * @var
+     */
     private static $chain_sign;
+    /**
+     * @var
+     */
     private static $chain_hash;
 
+    /**
+     * @return string
+     */
     public static function chain_init()
     {
         self::$chain_block_last_file = self::$chain_dir.self::$chain_env.self::$chain_block_last_file_ext;
@@ -31,12 +79,17 @@ trait chain_simple {
 
         while(strlen(self::$chain_sign) < self::$chain_complexity) {
 
-            self::$chain_sign .= $chain_complexity_fill;
+            self::$chain_sign .= self::$chain_complexity_fill;
         }
         return self::$chain_sign;
     }
 
+    /**
+     * @return bool
+     */
     public function chain_block_next(){
+
+        $timestamp = microtime(true);
 
         $this->block_data->build();
         $this->block_data->hash_previous = self::$chain_block_previous->hash;
@@ -54,10 +107,15 @@ trait chain_simple {
         $this->block_init();
         self::$chain_block_index++;
         $this->block_data->index = self::$chain_block_index;
+        $this->block_data->cost = $timestamp - microtime(true);
+
 
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function chain_pow(){
 
         $nonce = 0;

@@ -11,7 +11,7 @@ trait timestamp_simple {
 
     public static function timestamp_get(){
 
-        return time();
+        return microtime(true);
     }
 
     public function timestamp_data(string $data){

@@ -1,25 +1,62 @@
 <?php
 
+/**
+ * Class Log_simple_data
+ */
 class Log_simple_data {
 
+    /**
+     * @var string
+     */
     private static $log_hash_algo = 'sha512';
+    /**
+     * @var string
+     */
     private static $log_timestamp_sep = '------ TIMESTAMP ------';
+    /**
+     * @var string
+     */
     private static $log_hash_sep = '------ HASH ------';
 
     use timestamp_simple;
 
+    /**
+     * @var int
+     */
     private $date;
+    /**
+     * @var
+     */
     private $data_hash;
+    /**
+     * @var
+     */
     private $data_ref;
+    /**
+     * @var
+     */
     private $workflow_name;
+    /**
+     * @var
+     */
     private $workflow_state;
 
+    /**
+     * Log_simple_data constructor.
+     */
     public function __construct(){
 
         self::timestamp_init();
         $this->date = self::timestamp_get();
     }
 
+    /**
+     * @param string $data
+     * @param string $workflow_name
+     * @param string $workflow_state
+     * @param string $data_ref
+     * @return string
+     */
     public function build(string $data, string $workflow_name, string $workflow_state, string $data_ref = '') {
 
         $this->workflow_name = $workflow_name;
@@ -31,6 +68,10 @@ class Log_simple_data {
         return $data;
     }
 
+    /**
+     * @param stdClass $obj
+     * @return bool
+     */
     public function build_from_std(stdClass $obj){
 
         $this->date = $obj->date;
@@ -43,18 +84,30 @@ class Log_simple_data {
         return true;
     }
 
+    /**
+     * @return false|string
+     */
     public function to_json(){
 
         return json_encode($this);
     }
 }
 
-trait log_simple {
+/**
+ * Trait log_simple
+ */
+trait Log_simple {
 
-    use timestamp_simple;
+    use Timestamp_simple;
 
+    /**
+     * @var Log_simple_data
+     */
     private $log_data;
 
+    /**
+     * @return bool
+     */
     public function log_init(){
 
         $this->log_data = new Log_simple_data();
@@ -62,6 +115,13 @@ trait log_simple {
         return true;
     }
 
+    /**
+     * @param string $data
+     * @param string $workflow_name
+     * @param string $workflow_state
+     * @param string $data_ref
+     * @return mixed
+     */
     public function log_build(string $data, string $workflow_name, string $workflow_state, string $data_ref = '') {
 
         $this->log_data->build($data, $workflow_name, $workflow_state, $data_ref);
