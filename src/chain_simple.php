@@ -62,7 +62,7 @@ trait Chain_simple {
     /**
      * @var
      */
-    private static $chain_sign;
+    protected static $chain_sign;
     /**
      * @var
      */
@@ -109,8 +109,7 @@ trait Chain_simple {
         $this->block_data->index = self::$chain_block_index;
         $this->block_data->cost = $timestamp - microtime(true);
 
-
-        return true;
+        return self::$chain_block_index;
     }
 
     /**
