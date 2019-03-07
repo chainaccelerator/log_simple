@@ -28,7 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Trait Bloom_filter_simple
  */
-Trait Bloom_filter_simple {
+Trait Bloom_filter_simple
+{
 
     /**
      * @var int
@@ -70,12 +71,13 @@ Trait Bloom_filter_simple {
      * @param bool $union
      * @return bool
      */
-    private static function bloom_filter_merge($bf1, $bf2, $bfout, $union = false){
+    private static function bloom_filter_merge($bf1, $bf2, $bfout, $union = false)
+    {
         if ($bf1->bloom_filter_m != $bf2->bloom_filter_m) return false;
         if ($bf1->bloom_filter_k != $bf2->bloom_filter_k) return false;
         if ($bf1->bloom_filter_hash != $bf2->bloom_filter_hash) return false;
         // $length = strlen($bfout->bloom_filter_bit_array);
-        if ($union){
+        if ($union) {
             $bfout->bloom_filter_bit_array = $bf1->bloom_filter_bit_array | $bf2->bloom_filter_bit_array;
             $bfout->bloom_filter_n = $bf1->bloom_filter_n + $bf2->bloom_filter_n;
         } else {
@@ -90,12 +92,13 @@ Trait Bloom_filter_simple {
      * @param $p
      * @return Bloom_filter_simple|bool
      */
-    public static function bloom_filter_createFromProbability($n, $p){
-        if ($p <= 0 || $p >= 1)  return false;
-        if ($n <= 0)  return false;
-        $k = floor(log(1/$p,2));
-        $m = pow(2,ceil(log(-$n*log($p)/pow(log(2),2),2))); //approximate estimator method
-        return new self($m,$k);
+    public static function bloom_filter_createFromProbability($n, $p)
+    {
+        if ($p <= 0 || $p >= 1) return false;
+        if ($n <= 0) return false;
+        $k = floor(log(1 / $p, 2));
+        $m = pow(2, ceil(log(-$n * log($p) / pow(log(2), 2), 2))); //approximate estimator method
+        return new self($m, $k);
     }
 
     /**
@@ -103,9 +106,10 @@ Trait Bloom_filter_simple {
      * @param $bf2
      * @return Bloom_filter_simple
      */
-    public static function bloom_filter_getUnion($bf1, $bf2){
-        $bf = new self($bf1->bloom_filter_m,$bf1->bloom_filter_k,$bf1->bloom_filter_hash);
-        self::bloom_filter_merge($bf1,$bf2,$bf,true);
+    public static function bloom_filter_getUnion($bf1, $bf2)
+    {
+        $bf = new self($bf1->bloom_filter_m, $bf1->bloom_filter_k, $bf1->bloom_filter_hash);
+        self::bloom_filter_merge($bf1, $bf2, $bf, true);
         return $bf;
     }
 
@@ -114,9 +118,10 @@ Trait Bloom_filter_simple {
      * @param $bf2
      * @return Bloom_filter_simple
      */
-    public static function bloom_filter_getIntersection($bf1, $bf2){
-        $bf = new self($bf1->bloom_filter_m,$bf1->bloom_filter_k,$bf1->bloom_filter_hash);
-        self::bloom_filter_merge($bf1,$bf2,$bf,false);
+    public static function bloom_filter_getIntersection($bf1, $bf2)
+    {
+        $bf = new self($bf1->bloom_filter_m, $bf1->bloom_filter_k, $bf1->bloom_filter_hash);
+        self::bloom_filter_merge($bf1, $bf2, $bf, false);
         return $bf;
     }
 
@@ -126,18 +131,19 @@ Trait Bloom_filter_simple {
      * @param $k
      * @param string $h
      */
-    public function __construct($m, $k, $h='md5'){
-        if ($m < 8)  return false;
-        if (($m & ($m - 1)) !== 0)  return false;
-        if ($m > 8589934592)  return false;
+    public function __construct($m, $k, $h = 'md5')
+    {
+        if ($m < 8) return false;
+        if (($m & ($m - 1)) !== 0) return false;
+        if ($m > 8589934592) return false;
         $this->bloom_filter_m = $m; //number of bits
         $this->bloom_filter_k = $k;
         $this->bloom_filter_hash = $h;
-        $address_bits = (int)log($m,2);
+        $address_bits = (int)log($m, 2);
         $this->bloom_filter_mask = (1 << $address_bits) - 8;
         $this->bloom_filter_chunk_size = (int)ceil($address_bits / 8);
-        $this->bloom_filter_hash_times = ((int)ceil($this->bloom_filter_chunk_size * $this->bloom_filter_k / strlen(hash($this->bloom_filter_hash,null,true)))) - 1;
-        $this->bloom_filter_bit_array = (binary)(str_repeat("\0",$this->bloom_filter_getArraySize(true)));
+        $this->bloom_filter_hash_times = ((int)ceil($this->bloom_filter_chunk_size * $this->bloom_filter_k / strlen(hash($this->bloom_filter_hash, null, true)))) - 1;
+        $this->bloom_filter_bit_array = (binary)(str_repeat("\0", $this->bloom_filter_getArraySize(true)));
 
         return true;
     }
@@ -146,8 +152,9 @@ Trait Bloom_filter_simple {
      * @param int $n
      * @return float|int
      */
-    public function bloom_filter_calculateProbability($n = 0){
-        return pow(1-pow(1-1/$this->bloom_filter_m,$this->bloom_filter_k*($n ?: $this->bloom_filter_n)),$this->bloom_filter_k);
+    public function bloom_filter_calculateProbability($n = 0)
+    {
+        return pow(1 - pow(1 - 1 / $this->bloom_filter_m, $this->bloom_filter_k * ($n ?: $this->bloom_filter_n)), $this->bloom_filter_k);
         // return pow(1-exp($this->bloom_filter_k*($n ?: $this->bloom_filter_n)/$this->bloom_filter_m),$this->bloom_filter_k); //approximate estimator
     }
 
@@ -155,14 +162,16 @@ Trait Bloom_filter_simple {
      * @param $p
      * @return float
      */
-    public function bloom_filter_calculateCapacity($p){
-        return floor($this->bloom_filter_m*log(2)/log($p,1-pow(1-1/$this->bloom_filter_m,$this->bloom_filter_m*log(2))));
+    public function bloom_filter_calculateCapacity($p)
+    {
+        return floor($this->bloom_filter_m * log(2) / log($p, 1 - pow(1 - 1 / $this->bloom_filter_m, $this->bloom_filter_m * log(2))));
     }
 
     /**
      * @return int
      */
-    public function bloom_filter_getElementCount(){
+    public function bloom_filter_getElementCount()
+    {
         return $this->bloom_filter_n;
     }
 
@@ -170,14 +179,16 @@ Trait Bloom_filter_simple {
      * @param bool $bytes
      * @return int
      */
-    public function bloom_filter_getArraySize($bytes = false){
+    public function bloom_filter_getArraySize($bytes = false)
+    {
         return $this->bloom_filter_m >> ($bytes ? 3 : 0);
     }
 
     /**
      * @return mixed
      */
-    public function bloom_filter_getHashCount(){
+    public function bloom_filter_getHashCount()
+    {
         return $this->bloom_filter_k;
     }
 
@@ -185,26 +196,28 @@ Trait Bloom_filter_simple {
      * @param null $p
      * @return string
      */
-    public function bloom_filter_getInfo($p = null){
-        $units = array('','K','M','G','T','P','E','Z','Y');
+    public function bloom_filter_getInfo($p = null)
+    {
+        $units = array('', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y');
         $M = $this->bloom_filter_getArraySize(true);
-        $magnitude = intval(floor(log($M,1024)));
+        $magnitude = intval(floor(log($M, 1024)));
         $unit = $units[$magnitude];
-        $M /= pow(1024,$magnitude);
-        return 'Allocated '.$this->bloom_filter_getArraySize().' bits ('.$M.' '.$unit.'Bytes)'.PHP_EOL.
-            'Using '.$this->bloom_filter_getHashCount(). ' ('.($this->bloom_filter_chunk_size << 3).'b) hashes'.PHP_EOL.
-            'Contains '.$this->bloom_filter_getElementCount().' elements'.PHP_EOL.
-            (isset($p) ? 'Capacity of '.number_format($this->bloom_filter_calculateCapacity($p)).' (p='.$p.')'.PHP_EOL : '');
+        $M /= pow(1024, $magnitude);
+        return 'Allocated ' . $this->bloom_filter_getArraySize() . ' bits (' . $M . ' ' . $unit . 'Bytes)' . PHP_EOL .
+            'Using ' . $this->bloom_filter_getHashCount() . ' (' . ($this->bloom_filter_chunk_size << 3) . 'b) hashes' . PHP_EOL .
+            'Contains ' . $this->bloom_filter_getElementCount() . ' elements' . PHP_EOL .
+            (isset($p) ? 'Capacity of ' . number_format($this->bloom_filter_calculateCapacity($p)) . ' (p=' . $p . ')' . PHP_EOL : '');
     }
 
     /**
      * @param $key
      */
-    public function Bloom_filter_add($key){
-        $hash = hash($this->bloom_filter_hash,$key,true);
-        for ($i = 0; $i < $this->bloom_filter_hash_times; $i++) $hash .= hash($this->bloom_filter_hash,$hash,true);
-        for ($index = 0; $index < $this->bloom_filter_k; $index++){
-            $hash_sub = hexdec(unpack('H*',substr($hash,$index*$this->bloom_filter_chunk_size,$this->bloom_filter_chunk_size))[1]);
+    public function Bloom_filter_add($key)
+    {
+        $hash = hash($this->bloom_filter_hash, $key, true);
+        for ($i = 0; $i < $this->bloom_filter_hash_times; $i++) $hash .= hash($this->bloom_filter_hash, $hash, true);
+        for ($index = 0; $index < $this->bloom_filter_k; $index++) {
+            $hash_sub = hexdec(unpack('H*', substr($hash, $index * $this->bloom_filter_chunk_size, $this->bloom_filter_chunk_size))[1]);
             $word = ($hash_sub & $this->bloom_filter_mask) >> 3;
             $this->bloom_filter_bit_array[$word] = $this->bloom_filter_bit_array[$word] | chr(1 << ($hash_sub & 7));
         }
@@ -215,11 +228,12 @@ Trait Bloom_filter_simple {
      * @param $key
      * @return bool
      */
-    public function bloom_filter_contains($key){
-        $hash = hash($this->bloom_filter_hash,$key,true);
-        for ($i = 0; $i < $this->bloom_filter_hash_times; $i++) $hash .= hash($this->bloom_filter_hash,$hash,true);
-        for ($index = 0; $index < $this->bloom_filter_k; $index++){
-            $hash_sub = hexdec(unpack('H*',substr($hash,$index*$this->bloom_filter_chunk_size,$this->bloom_filter_chunk_size))[1]);
+    public function bloom_filter_contains($key)
+    {
+        $hash = hash($this->bloom_filter_hash, $key, true);
+        for ($i = 0; $i < $this->bloom_filter_hash_times; $i++) $hash .= hash($this->bloom_filter_hash, $hash, true);
+        for ($index = 0; $index < $this->bloom_filter_k; $index++) {
+            $hash_sub = hexdec(unpack('H*', substr($hash, $index * $this->bloom_filter_chunk_size, $this->bloom_filter_chunk_size))[1]);
             if ((ord($this->bloom_filter_bit_array[($hash_sub & $this->bloom_filter_mask) >> 3]) & (1 << ($hash_sub & 7))) === 0) return false;
         }
         return true;
@@ -228,14 +242,16 @@ Trait Bloom_filter_simple {
     /**
      * @param $bf
      */
-    public function bloom_filter_unionWith($bf){
-        self::bloom_filter_merge($this,$bf,$this,true);
+    public function bloom_filter_unionWith($bf)
+    {
+        self::bloom_filter_merge($this, $bf, $this, true);
     }
 
     /**
      * @param $bf
      */
-    public function bloom_filter_intersectWith($bf){
-        self::bloom_filter_merge($this,$bf,$this,false);
+    public function bloom_filter_intersectWith($bf)
+    {
+        self::bloom_filter_merge($this, $bf, $this, false);
     }
 }
