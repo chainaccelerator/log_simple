@@ -29,7 +29,7 @@ trait Block_simple {
      */
     public function block_get(string $step_name, string $height_new_push_address) {
 
-        $response = $this->socket_client_push_broadcast_request_count('/'.$step_name.'/address/'.$height_new_push_address.'/block');
+        $response = $this->socket_client_push_broadcast_request_count('/'.$step_name.'/block/'.$height_new_push_address);
 
         $block_data = $response->data->block_data;
 
