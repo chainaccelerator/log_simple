@@ -3,7 +3,8 @@
 /**
  * Trait Chain_simple
  */
-trait Chain_simple {
+trait Chain_simple
+{
 
     use Compress_simple;
     use Block_simple;
@@ -73,11 +74,11 @@ trait Chain_simple {
      */
     public static function chain_init()
     {
-        self::$chain_block_last_file = self::$chain_dir.self::$chain_env.self::$chain_block_last_file_ext;
-        self::$chain_file = self::$chain_dir.self::$chain_env.self::$chain_block_file_ext;
+        self::$chain_block_last_file = self::$chain_dir . self::$chain_env . self::$chain_block_last_file_ext;
+        self::$chain_file = self::$chain_dir . self::$chain_env . self::$chain_block_file_ext;
         self::$chain_sign = self::$chain_sign_prefix;
 
-        while(strlen(self::$chain_sign) < self::$chain_complexity) {
+        while (strlen(self::$chain_sign) < self::$chain_complexity) {
 
             self::$chain_sign .= self::$chain_complexity_fill;
         }
@@ -87,7 +88,8 @@ trait Chain_simple {
     /**
      * @return bool
      */
-    public function chain_block_next(){
+    public function chain_block_next()
+    {
 
         $timestamp = microtime(true);
 
@@ -115,16 +117,28 @@ trait Chain_simple {
     /**
      * @return bool
      */
-    public function chain_pow(){
+    public function chain_pow()
+    {
 
         $nonce = 0;
 
-        while(substr(self::$chain_hash, 0, self::$chain_complexity) !== self::$chain_sign) {
+        while (substr(self::$chain_hash, 0, self::$chain_complexity) !== self::$chain_sign) {
 
-            self::$chain_hash = hash(self::$chain_block_hash_algo, $this->block_data->hash.self::$chain_block_previous->hash.$nonce);
+            self::$chain_hash = hash(self::$chain_block_hash_algo, $this->block_data->hash . self::$chain_block_previous->hash . $nonce);
             $nonce++;
         }
         $this->block_data->nonce = $nonce;
+
+        return true;
+    }
+
+    /**
+     * @var Block_simple_data $block_data
+     * @return bool
+     */
+    public function chain_block_stage(Block_simple_data $block_data)
+    {
+        $this->block_data = $block_data;
 
         return true;
     }
