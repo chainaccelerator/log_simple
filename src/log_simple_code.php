@@ -60,7 +60,5 @@ class Log_simple_code extends Log_simple_data
 
         return $this->log_storage_extract();
     }
-
-
 }
 
