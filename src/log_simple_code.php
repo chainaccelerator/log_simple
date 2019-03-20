@@ -35,14 +35,13 @@ class Log_simple_code extends Log_simple_data
     }
 
     /**
-     * @param Log_simple_code_Interface $log_code_Interface
      * @param Log_simple_code_Interface_call $log_code_Interface_call
      * @return mixed
      */
     public function run(Log_simple_code_Interface_call $log_code_Interface_call)
     {
 
-        $this->load($this->log_storage_interface->ref, $this->log_storage_interface->signature, $this->log_storage_interface->public_key);
+        $this->load();
 
         eval($this->log_storage_data);
 
@@ -54,15 +53,12 @@ class Log_simple_code extends Log_simple_data
     }
 
     /**
-     * @param string $ref
-     * @param string $signature
-     * @param bool $public_key
      * @return bool
      */
-    private function load(string $ref, string $signature, $public_key = false)
+    private function load()
     {
 
-        return $this->log_storage_extract($ref, $signature, $public_key);
+        return $this->log_storage_extract();
     }
 
 
